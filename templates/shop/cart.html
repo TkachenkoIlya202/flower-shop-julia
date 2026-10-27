@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Корзина покупок — Магазин цветов «Julia»{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'shop:catalog' %}" class="text-success text-decoration-none">Главная</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Корзина заказа</li>
+        </ol>
+    </nav>
+
+    <h1 class="h3 fw-bold mb-4">Корзина заказа</h1>
+
+    {% if cart|length > 0 %}
+    <div class="row g-4">
+        <!-- Список позиций в заказе -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border mb-3">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title h6 mb-0 fw-bold">
+                        Выбранные букеты и товары ({{ cart|length }} шт.)
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Букет / Товар</th>
+                                <th class="text-center" style="width: 110px;">Цена</th>
+                                <th class="text-center" style="width: 140px;">Количество</th>
+                                <th class="text-end" style="width: 120px;">Сумма</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart %}
+                            {% with product=item.product %}
+                            <tr class="cart-row-{{ product.id }}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ product.display_image }}"
+                                             alt="{{ product.title }}"
+                                             class="rounded border"
+                                             style="width: 55px; height: 55px; object-fit: cover;">
+                                        <div>
+                                            <div class="small text-muted">{{ product.category.name }}</div>
+                                            <a href="{% url 'shop:product_detail' product.id product.slug %}"
+                                               class="text-decoration-none text-dark fw-bold small">
+                                                {{ product.title }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center small">
+                                    {{ item.price|floatformat:0 }} ₽
+                                </td>
+                                <td class="text-center">
+                                    <div class="input-group input-group-sm justify-content-center" style="max-width: 120px; margin: 0 auto;">
+                                        <button class="btn btn-outline-secondary qty-btn qty-change-btn"
+                                                type="button"
+                                                data-product-id="{{ product.id }}"
+                                                data-action="minus">-</button>
+                                        <input type="text"
+                                               class="form-control text-center bg-white qty-display qty-input-{{ product.id }}"
+                                               value="{{ item.quantity }}"
+                                               readonly>
+                                        <button class="btn btn-outline-secondary qty-btn qty-change-btn"
+                                                type="button"
+                                                data-product-id="{{ product.id }}"
+                                                data-action="plus">+</button>
+                                    </div>
+                                </td>
+                                <td class="text-end fw-bold text-success item-total-{{ product.id }}">
+                                    {{ item.total_price|floatformat:0 }} ₽
+                                </td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger btn-remove-item-ajax"
+                                            data-product-id="{{ product.id }}"
+                                            title="Удалить">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <a href="{% url 'shop:catalog' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Продолжить покупки
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Оформление заказа (Сайдбар) -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border mb-3">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title h6 mb-0 fw-bold">Оформление заказа</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Стоимость товаров:</span>
+                        <span class="fw-bold cart-summary-total">{{ cart.get_total_price|floatformat:0 }} ₽</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Доставка:</span>
+                        <span class="text-success small fw-bold">Бесплатно</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold">Итого к оплате:</span>
+                        <span class="fs-4 fw-bold text-success cart-summary-total">
+                            {{ cart.get_total_price|floatformat:0 }} ₽
+                        </span>
+                    </div>
+
+                    <!-- Форма заказа -->
+                    <form method="post" action="{% url 'shop:checkout' %}" id="checkout-form">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold" for="customer_name">Ваше имя *</label>
+                            {{ form.customer_name }}
+                            {% if form.customer_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.customer_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold" for="customer_phone">Номер телефона *</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold" for="customer_address">Адрес доставки</label>
+                            {{ form.address }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold" for="customer_card_message">Текст открытки (в подарок)</label>
+                            {{ form.card_message }}
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold" id="submit-order-button">
+                            Оформить заказ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Пустая корзина -->
+    <div class="card shadow-sm border text-center p-5 my-4">
+        <div class="card-body">
+            <i class="bi bi-cart-x text-muted" style="font-size: 3.5rem;"></i>
+            <h4 class="mt-3">Ваша корзина пуста</h4>
+            <p class="text-muted mb-4">В корзине пока нет товаров. Перейдите в каталог, чтобы выбрать свежие букеты.</p>
+            <a href="{% url 'shop:catalog' %}" class="btn btn-success">
+                Перейти в каталог цветов
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

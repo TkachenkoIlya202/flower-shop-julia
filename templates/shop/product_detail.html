@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.title }} — Магазин цветов «Julia»{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'shop:catalog' %}" class="text-success text-decoration-none">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:catalog_by_category' product.category.slug %}" class="text-success text-decoration-none">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Детали товара: 2 колонки -->
+    <div class="card shadow-sm border mb-5">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <!-- Фотография букета -->
+                <div class="col-md-6">
+                    <div class="position-relative bg-light rounded overflow-hidden border">
+                        <img src="{{ product.display_image }}"
+                             alt="{{ product.title }}"
+                             class="img-fluid w-100"
+                             style="max-height: 480px; object-fit: cover;">
+                        {% if product.is_featured %}
+                        <span class="position-absolute top-0 start-0 m-3 badge bg-success">
+                            Выбор флориста
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Информация о букете -->
+                <div class="col-md-6 d-flex flex-column">
+                    <span class="badge bg-secondary-subtle text-secondary align-self-start mb-2">
+                        {{ product.category.name }}
+                    </span>
+
+                    <h1 class="h3 fw-bold mb-2">{{ product.title }}</h1>
+
+                    <div class="d-flex align-items-baseline gap-3 mb-3">
+                        <span class="fs-2 fw-bold text-success">{{ product.price|floatformat:0 }} ₽</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            В наличии ({{ product.in_stock }} шт.)
+                        </span>
+                    </div>
+
+                    {% if product.composition %}
+                    <div class="p-3 bg-light rounded border mb-3">
+                        <div class="small fw-bold text-muted mb-1">Состав букета:</div>
+                        <div class="small">{{ product.composition }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if product.description %}
+                    <p class="text-secondary small mb-4">
+                        {{ product.description }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Кнопки добавления в корзину -->
+                    <div class="d-flex gap-2 mb-4">
+                        <button type="button"
+                                class="btn btn-success btn-add-cart px-4"
+                                data-product-id="{{ product.id }}">
+                            <i class="bi bi-cart-plus me-1"></i> В корзину
+                        </button>
+                        <a href="{% url 'shop:cart_detail' %}" class="btn btn-outline-secondary">
+                            Перейти в корзину
+                        </a>
+                    </div>
+
+                    <!-- Информация о флористе и уходе -->
+                    <div class="mt-auto pt-3 border-top small text-muted">
+                        <p class="mb-1">
+                            <i class="bi bi-person-check text-success"></i>
+                            <strong>Главный флорист:</strong> Ткаченко Юлия Геннадьевна
+                        </p>
+                        <p class="mb-0">
+                            <i class="bi bi-droplet text-primary"></i>
+                            <strong>Совет по уходу:</strong> подрезайте стебли под углом 45° и меняйте воду ежедневно.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Рекомендуемые товары из этой же категории -->
+    {% if related_products %}
+    <h3 class="h5 fw-bold mb-3">Похожие букеты</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+        {% for rel in related_products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border">
+                <img src="{{ rel.display_image }}" class="card-img-top" alt="{{ rel.title }}" style="height: 180px; object-fit: cover;">
+                <div class="card-body p-3 d-flex flex-column">
+                    <h6 class="card-title fw-bold small mb-2">
+                        <a href="{% url 'shop:product_detail' rel.id rel.slug %}" class="text-decoration-none text-dark">
+                            {{ rel.title }}
+                        </a>
+                    </h6>
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-success">{{ rel.price|floatformat:0 }} ₽</span>
+                        <button type="button" class="btn btn-sm btn-outline-success btn-add-cart" data-product-id="{{ rel.id }}">
+                            + В корзину
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

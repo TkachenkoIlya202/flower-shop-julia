@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F2EB" />
+      <stop offset="100%" stop-color="#E8E2D9" />
+    </linearGradient>
+    <radialGradient id="bloom1" cx="45%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#F7EDE8" />
+      <stop offset="70%" stop-color="#D8A48F" />
+      <stop offset="100%" stop-color="#C98E79" />
+    </radialGradient>
+    <radialGradient id="bloom2" cx="55%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="65%" stop-color="#E8C5B8" />
+      <stop offset="100%" stop-color="#B47762" />
+    </radialGradient>
+    <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3D6354" />
+      <stop offset="100%" stop-color="#1B3027" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="900" fill="url(#bg)" />
+
+  <!-- Botanical stems -->
+  <g stroke="url(#leaf)" stroke-width="8" stroke-linecap="round" opacity="0.85">
+    <path d="M400 750 Q390 550 400 420" />
+    <path d="M400 750 Q360 580 340 440" />
+    <path d="M400 750 Q440 590 460 450" />
+    <path d="M400 750 Q330 630 300 480" />
+    <path d="M400 750 Q470 620 500 490" />
+  </g>
+
+  <!-- Foliage / Eucalyptus leaves -->
+  <g fill="url(#leaf)" opacity="0.9">
+    <ellipse cx="320" cy="500" rx="35" ry="20" transform="rotate(-30 320 500)" />
+    <ellipse cx="480" cy="510" rx="35" ry="20" transform="rotate(25 480 510)" />
+    <ellipse cx="280" cy="460" rx="40" ry="22" transform="rotate(-45 280 460)" />
+    <ellipse cx="520" cy="470" rx="40" ry="22" transform="rotate(40 520 470)" />
+    <ellipse cx="360" cy="430" rx="30" ry="18" transform="rotate(-20 360 430)" />
+    <ellipse cx="440" cy="430" rx="30" ry="18" transform="rotate(15 440 430)" />
+  </g>
+
+  <!-- Flower blooms (Luxury Roses & Peonies) -->
+  <!-- Left Bloom -->
+  <circle cx="340" cy="380" r="70" fill="url(#bloom1)" />
+  <path d="M300 370 Q340 330 380 370 Q340 410 300 370" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.6" />
+  <path d="M310 380 Q340 350 370 380 Q340 410 310 380" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.5" />
+
+  <!-- Right Bloom -->
+  <circle cx="460" cy="390" r="65" fill="url(#bloom1)" />
+  <path d="M420 380 Q460 340 500 380 Q460 420 420 380" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.6" />
+
+  <!-- Center Grand Bloom (Peony/O'Hara Rose) -->
+  <circle cx="400" cy="330" r="85" fill="url(#bloom2)" />
+  <circle cx="400" cy="330" r="60" fill="url(#bloom1)" opacity="0.8" />
+  <path d="M360 320 Q400 270 440 320 Q400 370 360 320" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.7" />
+  <path d="M375 330 Q400 295 425 330 Q400 365 375 330" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.8" />
+
+  <!-- Ribbon and bow -->
+  <g fill="#284439">
+    <rect x="375" y="660" width="50" height="30" rx="6" />
+    <path d="M375 675 Q320 660 330 700 Q360 700 380 685 Z" />
+    <path d="M425 675 Q480 660 470 700 Q440 700 420 685 Z" />
+    <path d="M385 690 L360 780 L380 775 L395 690 Z" opacity="0.9" />
+    <path d="M415 690 L440 780 L420 775 L405 690 Z" opacity="0.9" />
+  </g>
+
+  <!-- Brand watermark -->
+  <text x="400" y="845" font-family="'Roboto', sans-serif" font-size="28" fill="#198754" letter-spacing="3" text-anchor="middle" font-weight="700">
+    JULIA
+  </text>
+  <text x="400" y="870" font-family="'Roboto', sans-serif" font-size="12" fill="#6c757d" letter-spacing="2" text-anchor="middle">
+    МАГАЗИН ЦВЕТОВ
+  </text>
+</svg>

@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if category %}
+        {{ category.name }} — Магазин цветов «Julia»
+    {% else %}
+        Каталог цветов — Магазин цветов «Julia»
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Простой и аккуратный баннер магазина -->
+<div class="bg-white border-bottom py-4 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-success-subtle text-success border border-success-subtle mb-2 px-3 py-2 rounded-pill">
+                    <i class="bi bi-award"></i> Главный флорист: Ткаченко Юлия Геннадьевна
+                </span>
+                <h1 class="h2 fw-bold text-dark mb-2">Цветочный магазин «Julia»</h1>
+                <p class="text-muted mb-0">
+                    Свежие монобукеты из роз и хризантем, авторские цветочные композиции и праздничные подарки с бережной доставкой по городу.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex gap-2">
+                    <span class="badge bg-light text-secondary border p-2">
+                        <i class="bi bi-clock"></i> Доставка от 60 мин
+                    </span>
+                    <span class="badge bg-light text-secondary border p-2">
+                        <i class="bi bi-check2-circle text-success"></i> Гарантия свежести
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <!-- Панель фильтров: Категории, Поиск и Сортировка -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <!-- Категории (Кнопки) -->
+                <div class="col-lg-7">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'shop:catalog' %}"
+                           class="btn btn-sm {% if not category %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                            Все букеты ({{ total_products }})
+                        </a>
+                        {% for cat in categories %}
+                        <a href="{% url 'shop:catalog_by_category' cat.slug %}"
+                           class="btn btn-sm {% if category and category.slug == cat.slug %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Поиск и сортировка -->
+                <div class="col-lg-5">
+                    <form method="get" action="{% url 'shop:catalog' %}" class="d-flex gap-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Поиск цветов...">
+                            {% if search_query %}
+                            <a href="{% url 'shop:catalog' %}" class="btn btn-outline-secondary" title="Сбросить поиск">✕</a>
+                            {% endif %}
+                        </div>
+
+                        <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                            <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Популярные</option>
+                            <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+                            <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+                            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Новинки</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Заголовок активного раздела -->
+    <div class="d-flex justify-content-between align-items-baseline mb-3">
+        <h2 class="h4 fw-bold text-dark mb-0">
+            {% if category %}
+                {{ category.name }}
+            {% elif search_query %}
+                Результаты поиска: «{{ search_query }}»
+            {% else %}
+                Каталог букетов и подарков
+            {% endif %}
+        </h2>
+        <span class="text-muted small">Найдено позиций: {{ products.count }}</span>
+    </div>
+
+    {% if category and category.description %}
+    <div class="alert alert-light border small mb-4">
+        {{ category.description }}
+    </div>
+    {% endif %}
+
+    <!-- Сетка карточек товаров (Стандартный Bootstrap 5 Grid) -->
+    {% if products %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border product-card">
+                <!-- Фотография товара -->
+                <div class="position-relative overflow-hidden bg-light">
+                    <a href="{% url 'shop:product_detail' product.id product.slug %}">
+                        <img src="{{ product.display_image }}"
+                             class="card-img-top"
+                             alt="{{ product.title }}"
+                             style="height: 240px; object-fit: cover;"
+                             loading="lazy">
+                    </a>
+
+                    <!-- Бейджи на фото -->
+                    {% if product.is_featured %}
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-success shadow-sm">
+                        Выбор флориста
+                    </span>
+                    {% endif %}
+
+                    {% if product.in_stock <= 3 %}
+                    <span class="position-absolute bottom-0 end-0 m-2 badge bg-warning text-dark shadow-sm">
+                        Осталось {{ product.in_stock }} шт.
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Содержимое карточки -->
+                <div class="card-body d-flex flex-column">
+                    <div class="text-muted small mb-1">{{ product.category.name }}</div>
+                    <h5 class="card-title h6 fw-bold mb-2">
+                        <a href="{% url 'shop:product_detail' product.id product.slug %}" class="text-decoration-none text-dark">
+                            {{ product.title }}
+                        </a>
+                    </h5>
+
+                    {% if product.composition %}
+                    <p class="card-text text-muted small flex-grow-1 mb-3">
+                        <strong>Состав:</strong> {{ product.composition|truncatechars:90 }}
+                    </p>
+                    {% elif product.description %}
+                    <p class="card-text text-muted small flex-grow-1 mb-3">
+                        {{ product.description|truncatewords:10 }}
+                    </p>
+                    {% else %}
+                    <div class="flex-grow-1"></div>
+                    {% endif %}
+
+                    <!-- Цена и кнопка покупки -->
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <div class="fw-bold fs-5 text-dark">
+                            {{ product.price|floatformat:0 }} ₽
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-success btn-add-cart"
+                                data-product-id="{{ product.id }}"
+                                id="add-to-cart-{{ product.id }}">
+                            <i class="bi bi-cart-plus me-1"></i> В корзину
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card text-center p-5 border shadow-sm">
+        <div class="card-body">
+            <i class="bi bi-flower2 text-muted" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">Букеты не найдены</h4>
+            <p class="text-muted">Попробуйте изменить поисковый запрос или выбрать другую категорию цветов.</p>
+            <a href="{% url 'shop:catalog' %}" class="btn btn-outline-success">Сбросить фильтры</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заказ #{{ order.id }} оформлен — Магазин цветов «Julia»{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 720px;">
+    <div class="card shadow-sm border text-center p-4 p-md-5">
+        <div class="card-body">
+            <div class="text-success mb-3" style="font-size: 3.5rem;">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mb-3">
+                Заказ #{{ order.id }} успешно принят
+            </span>
+
+            <h1 class="h3 fw-bold mb-3">Спасибо за ваш заказ!</h1>
+            <p class="text-muted mb-4">
+                Мы приняли вашу заявку. Главный флорист <strong>Ткаченко Юлия Геннадьевна</strong> и команда магазина свяжутся с вами по номеру <strong class="text-dark">{{ order.phone }}</strong> в ближайшее время для подтверждения доставки.
+            </p>
+
+            <!-- Детали заказа -->
+            <div class="bg-light text-start p-3 p-md-4 rounded border mb-4">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                    <span class="fw-bold small text-uppercase">Параметры заказа</span>
+                    <span class="badge bg-primary">{{ order.status }}</span>
+                </div>
+
+                <div class="small mb-2"><strong>Получатель:</strong> {{ order.customer_name }}</div>
+                <div class="small mb-2"><strong>Телефон:</strong> {{ order.phone }}</div>
+                {% if order.address %}
+                <div class="small mb-2"><strong>Адрес доставки:</strong> {{ order.address }}</div>
+                {% endif %}
+                {% if order.card_message %}
+                <div class="small mb-2"><strong>Текст открытки:</strong> «{{ order.card_message }}»</div>
+                {% endif %}
+                <div class="small mb-3"><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+
+                <h6 class="fw-bold small border-top pt-3 mb-2">Позиции:</h6>
+                <ul class="list-unstyled small mb-0">
+                    {% for item in order.items.all %}
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>{{ item.product.title }} ({{ item.quantity }} шт.)</span>
+                        <span class="fw-bold">{{ item.get_cost|floatformat:0 }} ₽</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 mt-2 border-top">
+                    <span class="fw-bold">Итого:</span>
+                    <span class="fs-5 fw-bold text-success">{{ order.total_price|floatformat:0 }} ₽</span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'shop:catalog' %}" class="btn btn-success">
+                    <i class="bi bi-house me-1"></i> Вернуться в каталог
+                </a>
+                <a href="tel:+79222091616" class="btn btn-outline-secondary">
+                    <i class="bi bi-telephone me-1"></i> Позвонить нам
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
